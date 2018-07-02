@@ -1,0 +1,15 @@
+{
+    "name": "filejam",
+    "version": "0.1.0",
+    "description": "A simple file server with a webapp frontend client",
+    "main": "index.js",
+    "bin": {
+        "filejam": "cli"
+    },
+    "author": "seancheung <theoxuanx@gmail.com> (https://seanz.me)",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.16.3",
+        "yargs-parser": "^10.1.0"
+    }
+}
