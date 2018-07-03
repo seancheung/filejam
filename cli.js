@@ -64,7 +64,7 @@ function start() {
             console.log(data.toString());
         });
         child.stderr.on('data', data => {
-            console.log(data.toString());
+            console.error(data.toString());
         });
     }
 }
@@ -83,7 +83,7 @@ function connect(cb) {
         console.error(err);
     });
     client.on('data', data => {
-        console.log(data);
+        console.log(JSON.parse(data));
         client.destroy();
     });
 
