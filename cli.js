@@ -53,11 +53,25 @@ function start() {
         params.push('--daemon', argv.daemon);
         const child = spawn(process.execPath, params, {
             detached: true,
-            stdio: 'ignore'
+            stdio: ['ignore', 'ignore', 'ignore', 'ipc']
         });
-        child.unref();
-        console.log('The application is running in the background now');
-        process.exit(0);
+        child.on('disconnect', () => {
+            child.unref();
+            process.exit(0);
+        });
+        child.on('message', data => {
+            data = JSON.parse(data);
+            if (data.success) {
+                delete data.success;
+                console.log(
+                    'The application is running in the background now',
+                    data
+                );
+            } else {
+                console.error(data.error);
+                process.exit(1);
+            }
+        });
     } else {
         const child = spawn(process.execPath, params);
         child.stdout.on('data', data => {
@@ -84,6 +98,10 @@ function connect(cb) {
     });
     client.on('data', data => {
         console.log(JSON.parse(data));
+        client.destroy();
+    });
+    client.on('timeout', () => {
+        console.error('connection timeout');
         client.destroy();
     });
 
