@@ -1,20 +1,15 @@
 /*eslint no-console: off*/
 
-const express = require('express');
+const http = require('http');
+const app = require('./app');
+
 const argv = require('yargs-parser')(process.argv.slice(2), {
     string: ['host'],
     number: ['port'],
     boolean: ['daemon']
 });
 
-const app = express();
-
-const server = app.listen(argv.port || 8000, argv.host || 'localhost', () => {
-    console.log('http started', server.address());
-    if (argv.daemon === true) {
-        require('./daemon')(null, app, server, argv);
-    }
-});
+const server = http.createServer(app);
 server.on('error', err => {
     if (err.syscall !== 'listen') {
         console.error(err);
@@ -23,7 +18,6 @@ server.on('error', err => {
     }
 
     let fatal;
-    // handle specific listen errors with friendly messages
     switch (err.code) {
     case 'EACCES':
     case 'EADDRINUSE':
@@ -42,3 +36,10 @@ server.on('error', err => {
         }
     }
 });
+server.on('listening', () => {
+    console.log('http started', server.address());
+    if (argv.daemon === true) {
+        require('./daemon')(null, app, server, argv);
+    }
+});
+server.listen(argv.port || 8000, argv.host || 'localhost');
